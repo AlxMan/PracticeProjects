@@ -1,0 +1,230 @@
+package model1;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Scanner;
+
+public class testM {
+
+    public static void main(String[] args) {
+        //1.提示用户输入年月日信息，判断这一天是这一年中的第几天并打印。
+        System.out.println("请输入年月日信息");
+        Scanner scan = new Scanner(System.in);
+        int year = scan.nextInt();
+        int month = scan.nextInt();
+        int day = scan.nextInt();
+        int total = 0;
+        //判断是否是闰年
+        if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
+            int[] months = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+            for (int i = 0; i < month - 1; i++) {
+                total = total + months[i];
+            }
+            total = total + day;
+            System.out.println("这是这一年的第" + total + "天");
+        } else {
+            int[] months = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+            for (int i = 0; i < month - 1; i++) {
+                total = total + months[i];
+            }
+            total = total + day;
+            System.out.println("这是这一年的第" + total + "天");
+        }
+        System.out.println("华丽的分割线---------------------------------------------------------------------------------");
+        //2.编程找出 1000 以内的所有完数并打印出来。所谓完数就是一个数恰好等于它的因子之和，如：6=1＋2＋3
+        System.out.println("1到1000的完数有");
+        for (int i = 1; i < 1000; i++) {
+            int t = 0;
+            for (int j = 1; j <= i / 2; j++) {
+                if (i % j == 0) {
+                    t = t + j;
+                }
+            }
+            if (t == i) {
+                System.out.println(i);
+            }
+        }
+        System.out.println("华丽的分割线---------------------------------------------------------------------------------");
+        /**
+         *         3.实现双色球抽奖游戏中奖号码的生成，中奖号码由 6 个红球号码和 1 个蓝球号码组成。
+         *         其中红球号码要求随机生成 6 个 1~33 之间不重复的随机号码。
+         *         其中蓝球号码要求随机生成 1 个 1~16 之间的随机号码。
+         */
+        int[] userNum = new int[7];
+        int[] sysNum = new int[7];
+        //彩民 购买彩票（6+1）
+        System.out.println("请输入红色球的号码（1-33）");
+        Scanner sc = new Scanner(System.in);
+        for (int i = 0; i < 6; i++) {
+            int n = sc.nextInt();
+            boolean isExist = false;
+            //循环数组，判断n是否已经存在于数组中
+            for (int j = 0; j < i; j++) {
+                if (userNum[j] == n) {
+                    isExist = true;
+                    i--;
+                    break;
+                }
+            }
+            if (!isExist) {
+                userNum[i] = n;
+            } else {
+                System.out.println("此号已选，请重选！");
+            }
+        }
+        System.out.println("请输入蓝色球的号码（1-16）：");
+        userNum[6] = sc.nextInt();
+
+        System.out.println("您购买的双色球号码为：" + Arrays.toString(userNum));
+
+        System.out.println(".....系统开奖.....");
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+
+            e.printStackTrace();
+        }
+
+        Random random = new Random();
+        for (int i = 0; i < sysNum.length - 1; i++) {
+            int n = random.nextInt(33) + 1;
+            boolean isExist = false;
+            //循环数组，判断n是否已经存在于数组中
+            for (int j = 0; j < i; j++) {
+                if (sysNum[j] == n) {
+                    isExist = true;
+                    i--;
+                    break;
+                }
+            }
+            if (!isExist) {
+                sysNum[i] = n;
+            }
+        }
+        sysNum[6] = random.nextInt(16) + 1;
+
+        System.out.println("双色球开奖号码为：" + Arrays.toString(sysNum));
+
+
+        //系统开奖（6+1）
+        //比对    中奖结果
+        int count = compare(userNum, sysNum);
+        System.out.println("红色球相同的个数：" + count);
+
+        //开奖
+        if (count == 6 && userNum[6] == sysNum[6]) {
+            System.out.println("恭喜你，中了一等奖。奖金500万。");
+        } else if (count == 6 && userNum[6] != sysNum[6]) {
+            System.out.println("恭喜你，中了二等奖。奖金300万。");
+        } else if (count == 5 && userNum[6] == sysNum[6]) {
+            System.out.println("恭喜你，中了三等奖。奖金3000。");
+        } else if ((count == 5 && userNum[6] != sysNum[6]) || (count == 4 && userNum[6] == sysNum[6])) {
+            System.out.println("恭喜你，中了四等奖。奖金200。");
+        } else if ((count == 4 && userNum[6] != sysNum[6]) || (count == 3 && userNum[6] == sysNum[6])) {
+            System.out.println("恭喜你，中了五等奖。奖金10。");
+        } else if ((count == 2 && userNum[6] == sysNum[6]) || (count == 1 && userNum[6] == sysNum[6]) || (count == 0 && userNum[6] == sysNum[6])) {
+            System.out.println("恭喜你，中了六等奖。奖金5。");
+        } else {
+            System.out.println("很遗憾，没中奖，请继续努力！");
+        }
+
+        }
+
+        //比对两个数组的前6个元素，返回相同元素的个数
+        public static int compare ( int[] arr1, int[] arr2){
+            int count = 0;
+            for (int i = 0; i < arr1.length - 1; i++) {
+                for (int j = 0; j < arr2.length - 1; j++) {
+                    if (arr1[i] == arr2[j]) {
+                        count++;
+                        break;
+                    }
+                }
+            }
+            return count;
+        }
+
+
+
+//        public static void main(String[] args) {
+//            System.out.println("华丽的分割线---------------------------------------------------------------------------------");
+//            /**
+//             * 4.自定义数组扩容规则，当已存储元素数量达到总容量的 80%时，扩容 1.5 倍。
+//             * 例如，总容量是 10，当输入第 8 个元素时，数组进行扩容，容量从 10 变 15。
+//             */
+//            Scanner scanner = new Scanner(System.in);
+//            int n = scanner.nextInt();
+//            int[] arr = new int[n];
+//            int[] arr1 = new int[n];
+//            //声明一个计数变量用来记录当前放入数组中的元素个数
+//            int count = 0;
+//            int num;
+//            String flag;
+//            outer:
+//            while (true) {
+//                for (int i = 0; i < arr.length; i++) {
+//                    System.out.println("请输入放入的元素：");
+//                    num = scanner.nextInt();
+//                    arr[i] = num;
+//                    count++;
+//                    if (count >= arr.length * 0.8) {
+//                        arr1 = new int[arr.length + (arr.length >> 1)];
+//                        System.arraycopy(arr, 0, arr1, 0, count);
+//
+//                        arr = new int[arr.length + (arr.length >> 1)];
+//                        System.arraycopy(arr1, 0, arr, 0, count);
+//                    }
+//                    System.out.println("是否继续输入？ y/n");
+//                    flag = scanner.next();
+//                    if (flag.equals("n")) {
+//                        System.out.println("当前数组长度为" + arr.length + "当前数组元素为" + Arrays.toString(arr));
+//                        break outer;
+//                    }
+//                }
+//            }
+//        }
+
+
+
+//    /**
+//     * 5.使用双重循环实现五子棋游戏棋盘的绘制，棋盘界面的具体效果如下：
+//     * @param args
+//     */
+//    public static void main(String[] args) {
+//        int num = 15;
+//        if (args.length > 0) {
+//            try {
+//                num = Integer.parseInt(args[0]);
+//            } catch (Exception e) {
+//                System.err.println("只能输入整数");
+//            }
+//        }
+//        print(num);
+//    }
+//
+//    public static void print(int n) {
+//        if (n > 16 || n < 0) {
+//            System.out.println("n范围不对");
+//            return;
+//        }
+//        for (int i = -1; i < n; i++) {//行
+//            for (int j = -1; j < n; j++) {//列
+//                if (j < 0 && i < 0) {//第一列第一行不输出
+//                    System.out.print("    ");
+//                    continue;
+//                }
+//                if (i == -1) {//第一行以16进制输出
+//                    System.out.printf("%-4x", j);
+//                    continue;
+//                }
+//                if (j >= 0) {//第2列开始只输出+号
+//                    System.out.print("+   ");
+//                    continue;
+//                }
+//                //第二行以后以16进制输出
+//                System.out.printf("%-4x", i);
+//            }
+//            System.out.println();
+//        }
+//    }
+}
