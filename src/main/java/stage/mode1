@@ -1,0 +1,166 @@
+-- 查询练习
+ #1.查询所有的商品
+SELECT * FROM products;
+ #2.查询商品名和商品价格
+SELECT price,pname FROM products;
+ #3.别名查询.使用的关键字是as（as可以省略的）. 
+SELECT price as '价格' FROM products;
+ #4.查询商品价格，对价格去除重复；
+SELECT DISTINCT price FROM products;
+ #5.查询结果是表达式（运算查询）：将所有商品的价格+10元进行显示.
+SELECT pname,price+10 FROM products ;
+ #6.查询商品名称为“花花公子”的商品所有信息：
+SELECT * FROM products WHERE pname = '花花公子';
+ #7.查询价格为800商品
+SELECT * FROM products WHERE price = 800;
+ #8.查询价格不是800的所有商品
+SELECT * FROM products WHERE price <> 800;
+ #9.查询商品价格大于60元的所有商品信息
+SELECT * FROM products WHERE price > 60;
+ #10.查询商品价格在200到1000之间所有商品
+SELECT * FROM products WHERE price BETWEEN 200 AND 1000;
+ #11.查询商品价格是200或800的所有商品
+SELECT * FROM products WHERE price IN (200,800);
+ #12.查询含有'霸'字的所有商品
+SELECT * FROM products WHERE pname LIKE '%霸%';
+ #13.查询以'香'开头的所有商品
+SELECT * FROM product WHERE pname LIKE '香%';
+ #14.查询第二个字为'想'的所有商品
+SELECT * FROM product WHERE pname LIKE '_想%';
+ #15.商品没有分类的商品
+SELECT * FROM product WHERE category is NULL;
+ #16.查询有分类的商品
+SELECT * FROM product WHERE category is NOT NULL;
+-- 排序练习：
+    #1.使用价格对商品信息排序(降序)
+    -- 提示：使用order by语句 
+			SELECT * FROM products WHERE  ORDER BY price DESC;
+    #2.在价格排序(降序)的基础上，以主键排序(降序)
+    -- 提示：若价格相同，相同价格的数据以pid降序排序
+			SELECT * FROM products WHERE  ORDER BY price,pid DESC;		
+    #3.显示商品的价格(去重复)，并排序(降序)
+    -- 提示：DISTINCT 关键字去重 
+		SELECT DISTINCT price FROM products WHERE  ORDER BY price DESC;	
+-- 聚合函数/分组函数练习：
+    #1 查询商品的总条数(两种方式)
+    -- 提示：使用count()
+				SELECT COUNT(*) FROM products;
+    #2 查看price商品的总价格
+    -- 提示：使用sum();
+				SELECT sum(price) FROM products;
+    #3 查看price的最大值和最小值
+    -- 提示：使用max()  min()
+				SELECT max(price), min(price) FROM products;
+    #4 查看price的平均值
+    -- 提示：使用 AVG() 
+				SELECT AVG(price) FROM products;
+    #5 查询价格大于200商品的总条数
+    -- 提示：使用 COUNT(*)统计条数
+				SELECT COUNT(*) FROM products WHERE price >200;
+-- 分组练习：
+    #1 统计各个分类商品的个数
+				SELECT category,COUNT(*) FROM products GROUP BY  category;
+    #2 统计各个分类商品的个数,且只显示个数大于1的信息
+				SELECT category,COUNT(*) FROM products GROUP BY  category hiving COUNT(*) >1;
+SQL题2
+
+1) 查询工资最高的员工是谁？
+		SELECT name FROM emp WHERE price = (select max(price) FROM emp);
+2) 查询工资小于平均工资的员工有哪些？
+		select * FROM emp WHERE price <(select avg(price) FROM emp);
+3) 查询大于5000的员工，来至于哪些部门，输出部门的名字
+		select name from dept where id in (select dept_id from emp where salary > 5000);
+4) 查询开发部与财务部所有的员工信息，分别使用子查询和表连接实现
+	select employee.* from employee inner join dept on dept.id = employee.dept_id where dept.name = '开发部' OR dept.name = '财务部';
+5) 查询2011年以来入职的员工信息和部门信息，分别使用子查询和表连接实现
+select e.*, d.name from employee e inner join dept d on e.dept_id = d.id where e.join_date > "2011-12-31";
+
+SQL题3
+
+-- 1、查询平均成绩大于70分的同学的学号,姓名,和平均成绩
+	
+-- 1.1 分组查询每个学生的 学号,姓名,平均分
+		
+-- 1.2 增加条件：平均成绩大于70
+		select s.id, s.name, sa.avg_score from student s inner join (select student_id, avg(score) avg_score from student_course group by student_id) sa on s.id = sa.student_id where sa.avg_score > 70;
+
+第二题
+
+-- 2. 查询所有同学的学号、姓名、选课数、总成绩
+
+-- 2.1 需要查询两张表 student表和 student_course表
+
+-- 2.2 需要使用 student_id 学号字段,进行分组
+
+-- 2.3 需要使用到 count函数 sum函数
+select s.id, s.name, sc.cs, sc.ss  from student s inner join (select student_id, count(student_id) cs, sum(score) ss from student_course group by student_id) sc on s.id = sc.student_id;
+
+
+第三题
+
+-- 3. 查询学过赵云老师课程的同学的学号、姓名
+
+-- 3.1 查询赵云老师的id
+
+-- 3.2 根据老师ID,在课程表中查询所教的课程编号
+
+-- 3.3 将上面的子查询作为 where 后面的条件
+select s.id, s.name from student s inner join (select distinct student_id from student_course where course_id in (select c.id from course c inner join teacher t on c.teacher_id = t.id where t.name = '赵云')) si on si.student_id = s.id;
+
+
+
+第四题
+
+-- 4. 查询选课 少于三门学科的学员 
+
+-- 4.1 查询每个学生学了几门课 条件1：小于等于三门
+
+-- 4.2 查询 学号和姓名， 将4.1 作为临时表
+select s.id, s.name from student s inner join (select student_id from student_course group by student_id having  count(course_id) <= 3) sc on s.id = sc.student_id ; 
+
+SQL题4
+数据库表设计
+以下是我们拉钩教育平台数据库中的某几张表,为了降低难度,已经简化的表中字段 
+
+请同学们看图分析出三张表之间的关系
+
+
+-- 讲师表
+create table lagou_teacher (
+    tid int primary key AUTO_INCREMENT, # 讲师id
+		tname varchar(20),   # 讲师姓名
+		introduce varchar(180),  # 讲师简介
+		grade char(4)   # 讲师级别 1-高级讲师 2-首席讲师
+		
+);
+create index tname on lagou_teacher(tname);
+
+-- 课程分类表
+create table lagou_subject(
+		id int primary key AUTO_INCREMENT,  # 课程分类id
+		subject_name varchar(20),   # 课程分类名称
+		subject_introduce varchar(180),  # 课程分类描述
+		create_time datetime,   # 创建时间
+		update_time datetime    # 更新时间
+);
+
+-- 课程表
+create table lagou_course(
+		cid int primary key AUTO_INCREMENT,  # 课程id
+		teacher_id int,  # 课程讲师id
+		subject_id int,    # 课程分类id
+		title varchar(20),  # 课程标题
+		total int,    # 总课时
+		watch bigint,  # 浏览数量
+		state char(1) default '0',  # 课程状态  0 未发布(默认)  1 已发布
+		-- 创建外键索引
+		CONSTRAINT teacher_course_fk FOREIGN KEY(teacher_id) REFERENCES lagou_teacher(tid),
+		CONSTRAINT class_course_fk foreign key(subject_id) REFERENCES lagou_subject(id)
+
+);
+create index title on lagou_course(title);
+
+-- 查询刘德华老师所教的课程属于哪个课程分类
+-- 1.查询刘德华老师所教的课程
+-- 2.将第一步的结果作为where后面的条件
+select subject_name from lagou_subject where id = (select subject_id from lagou_course c INNER JOIN lagou_teacher t on c.teacher_id = t.tid where t.tname = '刘德华'); 
